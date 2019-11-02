@@ -11,7 +11,7 @@ OP_HASH160 <hash of secret> OP_EQUALVERIFY OP_DUP OP_HASH160 <public key hash> O
 
 To unlock (spend), you would need an unlocking script ("scriptSig") like this:
 ```
-<secret> <public key> <signature>
+<signature> <public key> <secret>
 ```
 
 However, there is an issue here with either party backing out at different stages of this protocol.  For example, if both transactions get mined but the first party backs-out and never finishes the swap, the second party's funds remain locked (so is the first party's but presumably such a malicious actor doesn't care).
