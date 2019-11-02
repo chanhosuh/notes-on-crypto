@@ -22,6 +22,24 @@ In Bitcoin-like blockchains, there's no way to invalidate a transaction, only a 
 
 In fact, at that time, there was no way to even lock an output to be spendable in the future.  Instead, one locked the output with a 2-of-2 multisig and then created another transaction spending that output with the `nlocktime` field set in the future.  Before initiating the swap proper, each party would sign the other's secondary transaction, enabling a timelocked refund.  Later, the `OP_CHECKLOCKTIMEVERIFY` op-code was proposed and accepted, which simplified matters and led to the HTLC.
 
+Here's the scriptPubKey for Alice's HTLC ([BIP-199][bip-199]):
+```
+OP_IF
+  OP_HASH160 <hash of secret> OP_EQUALVERIFY OP_DUP OP_HASH160 <bob public key hash>            
+OP_ELSE
+  <future time> OP_CHECKLOCKTIMEVERIFY OP_DROP OP_DUP OP_HASH160 <alice public key hash>
+OP_ENDIF
+OP_EQUALVERIFY
+OP_CHECKSIG
+```
 
+Note the use of a conditional.  By appropriate value in the scriptSig, the spender of the output can choose either branch.  
+
+If Alice is the spender (she's trying to get her locked coins refunded), she chooses the "else" branch.  Then `OP_CHECKLOCKTIMEVERIFY` ensures she is spending past `<future time>` (the spending transaction will be rejected otherwise).
+  
+If Bob is the spender, he needs `<secret>` which hashes to `<hash of secret>` in addition to his usual public key and signature.
+
+Bob's HTLC is similar but with parties switched.  Since Alice is going to reveal the secret by taking her coins first, the `<future time>` in Bob's HTLC should be further in the future than Alice's.  This gives Bob enough time to get refunded if Alice waits until the last moment to get her refund.
 
 [atomic-swap-tiernolan]: https://bitcointalk.org/index.php?topic=193281.msg2224949#msg2224949
+[bip-199]: https://github.com/bitcoin/bips/blob/master/bip-0199.mediawiki
