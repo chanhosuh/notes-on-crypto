@@ -20,7 +20,7 @@ As another example, after the first party's transaction gets mined, if the secon
 
 In Bitcoin-like blockchains, there's no way to invalidate a transaction, only a way to specify a time in the future when the transaction becomes valid.  Thus, in order to allow a party to backout and get refunded if the other party doesn't follow through, there's a bit of finagling with secondary transactions.  
 
-In fact, at that time, there was no way to even lock an output to be spendable in the future.  Instead, one locked the output with a 2-of-2 multisig and then created another transaction spending that output with the `nlocktime` field set in the future.  Before initiating the swap proper, each party would sign the other's secondary transaction, enabling a timelocked refund.  Later, the `OP_CTLV` (check-timelock-verify) op-code was proposed and accepted, which simplified matters and led to the HTLC.
+In fact, at that time, there was no way to even lock an output to be spendable in the future.  Instead, one locked the output with a 2-of-2 multisig and then created another transaction spending that output with the `nlocktime` field set in the future.  Before initiating the swap proper, each party would sign the other's secondary transaction, enabling a timelocked refund.  Later, the `OP_CHECKLOCKTIMEVERIFY` op-code was proposed and accepted, which simplified matters and led to the HTLC.
 
 
 
