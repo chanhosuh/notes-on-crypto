@@ -1,5 +1,7 @@
 # Hash Time Locked Contract for Ethereum
 
+## Background on HTLCs
+
 The Hash Time Locked Contract (HTLC) arose from a suggested *atomic swap* implementation [due to Tier Nolan][atomic-swap-tiernolan].  An atomic swap is a way to make two transfers, each on possibly different blockchains, such that either both succeed or both fail.  The two transfers are not necessarily simultaneous in time.
 
 This initial implemenation was for Bitcoin-like blockchains and required each party creating a transaction with the output requiring not only the other's signature but the pre-image of a hash.  The maker of the first such transaction, say "Alice", creates the hash.  Then the other party, "Bob", creates another such transaction with the same hash.  When Alice unlocks her funds using the hash pre-image and signature, Bob learns the pre-image and can then use it to unlock his funds.  
@@ -45,3 +47,13 @@ Bob's HTLC is similar but with parties switched.  Since Alice is going to reveal
 
 [atomic-swap-tiernolan]: https://bitcointalk.org/index.php?topic=193281.msg2224949#msg2224949
 [bip-199]: https://github.com/bitcoin/bips/blob/master/bip-0199.mediawiki
+
+## Oracle problem
+
+One sticking point in an atomic swap is setting the exchange rate.  The rate between two coins on two different blockchains is an "off-chain" value, i.e. is determined by the state of the world *outside* the state of the virtual machine running on the blockchain nodes.  How do we grab such a value and utilize it within our blockchain world?
+
+This is a special case of the "oracle" problem, and several frameworks have become popular for resolving it.  We decided for simplicity of development to go with Chainlink.
+
+Complete Chainlink usage example: https://docs.chain.link/docs/request-and-receive-data
+
+Example walkthrough using Remix IDE: https://docs.chain.link/docs/example-walkthrough
