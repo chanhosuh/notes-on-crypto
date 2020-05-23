@@ -13,29 +13,22 @@ financial transactions, but complex derivatives, and furthermore, the operation 
 distributed, autonomous organizations (DAOs). 
 
 
-## What is a smart contract?
-
-A smart contract is essentially a computer program that is always running in the Ethereum blockchain.
-The blockchain maintains the state of the program so that it can persist balances of *ether*, the
-native currency of Ethereum, alongside other variables that are used in the program.  This state
-is called *storage*.  
-
-
-### The world state
+## The world state
 
 As stated previously, the blockchain maintains a globally consistent state through consensus.  This is
 often called the "world state", due to Ethereum's nickname as the "world computer".  This state can be
 thought of as a mapping from addresses to accounts.
 
 The world state is not literally stored in the blocks of the blockchain; however, any node can re-create
-this state by playing through the transactions of every block.  This is why it's important to remember
+this state by executing the transactions of every block.  This is why it's important to remember
 that Ethereum is a state machine.  Every node must process every transaction in order to update to
-the latest state.  The trade-off here is security versus ease-of-use.  
+the latest state.  This sacrifices ease-of-use for security, as every state is then validated by
+every node in the network. 
 
 The world state is stored on a node as a trie.  Many of the important data in Ethereum is stored using
-the trie data structure.  This includes storage and transaction logs.
+the trie data structure.  This includes *storage* for each smart contract, and transaction logs, called *receipts*.
 
-#### Account
+## Account
 Each address maps to an account, which is stateful. An account consists of:
 
 - balance
@@ -57,18 +50,38 @@ an EOA and for CAs without any storage variables set.
 for an EOA.
 
 
-### Transactions
+### Externally-owned accounts (EOA)
 
-A transaction is an atomic operation on the world state initiated by an EOA.  A transaction can succeed or fail but can never execute partially.  In the even of a failed transaction,
+
+### Smart contract accounts (CA)
+
+A smart contract is essentially a computer program that is always running on the Ethereum blockchain.
+The blockchain maintains the state of the program so that it can persist balances of *ether*, the
+native currency of Ethereum, alongside other variables that are used in the program.  This state
+is called *storage*.  
+
+Every smart contract has an address, which allows value transfers to and from it, in addition to message
+calls to it from either EOAs or other smart contracts.
+
+
+## Transactions
+
+A *transaction* is an atomic operation on the world state initiated by an EOA.  A transaction can succeed or fail but can never execute partially.
+
+Every transaction costs *gas*, which is the unit of computation on the Ethereum blockchain.  Each gas unit for transaction execution must be paid for with ether.  A transaction sender will specify a *gas price*
+s/he is willing to pay and also a *gas limit*, an upper bound for the maximum amount of gas he or she
+is willing to pay to execute the transaction.
+
+In the event of a failed transaction,
 any effects on the state are rollbacked.  However, the EOA will not get refunded the gas
 cost, as that is required to pay the miners; this is protection against DoS.  Failed, but mined, transactions
 are still stored on the blockchain however.
 
 A transaction is one of two types:
 
-- sends a message call to an account (EOA or CA), either to change its state or transfer value (the latter
+- a *message call*: sent to an account (EOA or CA), either to change its state or transfer value (the latter
 is a special case of the former).
-- contract deployment, which creates a contract at a new address
+- *contract creation*: creates a contract at a new address (sometimes called contract deployment)
 
 Note that calling a contract can invoke further message calls to other accounts, but the entire
 transaction is atomic, all calls succeed or they all get rollbacked.
@@ -97,29 +110,40 @@ Transaction fields:
   EVM code for contract initialization
 
 
+### Blocks
 
+An Ethereum block header consists of:
 
-
-### Block header
-
-An Ethereum block header contains the root of three Merkle-Patricia tries:
-
-- previous header hash
-- transactions trie root
-- receipts trie root
-- state trie root
-
+- parenthash: previous header hash
+- ommershash: Merkle hash of the ommers headers
+- beneficiary: account of recipient of transaction fees
+- stateroot: root hash of world state trie
+- transactionsroot: root hash of transactions trie
+- receiptsroot: root hash of transaction receipts trie
+- logsbloom: bloom filter to check what event logs were generated in this block 
+- difficulty
+- number
+- gaslimit
+- gasused
+- extradata
+- mixhash
+- nonce
+- 
 
 
 Benefits of using Merkle-Patricia tries to implement mappings:
-- fully deterministic, same key-value pairs generate the same tries, down to the byte level
+
+- allows Merkle proofs, i.e. a proof can be provided for every key-value pair, allowing light clients
+  to trust the given key corresponds to the value, without having to maintain the world state
 - O(log n) insert, lookup, delete
+- fully deterministic, same key-value pairs generate the same tries, down to the byte level
+- more space / time efficient than regular tries, due to Patricia path compression
 
 
 ## References / Resources
 
 ### Comprehensive
-https://takenobu-hs.github.io/downloads/ethereum_evm_illustrated.pdf
+https://takenobu-hs.github.io/downloads/ethereum\_evm\_illustrated.pdf
 
 ### World state, Merkle Trees
 https://pegasys.tech/ethereum-explained-merkle-trees-world-state-transactions-and-more/
