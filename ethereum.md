@@ -8,9 +8,13 @@ eventual consistency between the nodes.  The current consensus mechanism is base
 Proof-of-Work (PoW) but will be upgraded to a Proof-of-Stake (PoS) protocol, code-named
 "Casper".  
 
-Smart contracts that run in the Ethereum blockchain (state machine) enable not only regular
-financial transactions, but complex derivatives, and furthermore, the operation of
-distributed, autonomous organizations (DAOs). 
+The blockchain enables *smart contracts*, computer programs that once deployed to
+the blockchain, cannot be changed and are accessible to anyone willing to pay for the cost
+of executing its code.
+
+These smart contracts maintain their own state, including balances, and so are able to act
+as counterparties in financial transactions or operate even autonomous organizations through
+voting or other mechanism.
 
 
 ## The world state
@@ -55,13 +59,12 @@ for an EOA.
 
 ### Smart contract accounts (CA)
 
-A smart contract is essentially a computer program that is always running on the Ethereum blockchain.
-The blockchain maintains the state of the program so that it can persist balances of *ether*, the
-native currency of Ethereum, alongside other variables that are used in the program.  This state
-is called *storage*.  
+A smart contract gets created by a transaction which contains all the contract bytecode in its `init`
+field.  Upon creation, it is assigned an address, which allows value transfers to and from it, in
+addition to message calls to it from either EOAs or other smart contracts.
 
-Every smart contract has an address, which allows value transfers to and from it, in addition to message
-calls to it from either EOAs or other smart contracts.
+The smart contract's *storage* maintains variables, such as its ether balance and others that may
+be used in the program.
 
 
 ## Transactions
