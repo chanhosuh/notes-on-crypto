@@ -2,7 +2,7 @@
 
 ## What is the Ethereum blockchain?
 
-The Ethereum blockchain is a replicated state machine where every node processes update events
+The Ethereum blockchain is a replicated state machine where every node processes events
 called "transactions" and updates its state accordingly.  A consensus mechanism enforces
 eventual consistency between the nodes.  The current consensus mechanism is based on
 Proof-of-Work (PoW) but will be upgraded to a Proof-of-Stake (PoS) protocol, code-named
@@ -10,18 +10,17 @@ Proof-of-Work (PoW) but will be upgraded to a Proof-of-Stake (PoS) protocol, cod
 
 The blockchain enables *smart contracts*, computer programs that once deployed to
 the blockchain, cannot be changed and are accessible to anyone willing to pay for the cost
-of executing its code.
+of code execution by *miners*.
 
 These smart contracts maintain their own state, including balances, and so are able to act
-as counterparties in financial transactions or operate even autonomous organizations through
-voting or other mechanism.
+as counterparties in financial transactions or even operate autonomous organizations through
+voting or other mechanisms.
 
 
 ## The world state
 
-As stated previously, the blockchain maintains a globally consistent state through consensus.  This is
-often called the "world state", due to Ethereum's nickname as the "world computer".  This state can be
-thought of as a mapping from addresses to accounts.
+The blockchain maintains a globally consistent state through consensus, often called the *world state*,
+due to Ethereum's nickname as the "world computer".  The world state is a mapping from addresses to accounts.
 
 The world state is not literally stored in the blocks of the blockchain; however, any node can re-create
 this state by executing the transactions of every block.  This is why it's important to remember
@@ -31,6 +30,9 @@ every node in the network.
 
 The world state is stored on a node as a trie.  Many of the important data in Ethereum is stored using
 the trie data structure.  This includes *storage* for each smart contract, and transaction logs, called *receipts*.
+Ethereum uses a particular form of trie called a *Merkle-Patricia trie*.  This is a highly efficient
+data structure that allows *Merkle proofs*.
+
 
 ## Account
 Each address maps to an account, which is stateful. An account consists of:
@@ -113,7 +115,10 @@ Transaction fields:
   EVM code for contract initialization
 
 
-### Blocks
+## Blocks
+
+
+### Block headers
 
 An Ethereum block header consists of:
 
@@ -131,8 +136,9 @@ An Ethereum block header consists of:
 - extradata
 - mixhash
 - nonce
-- 
 
+
+## Merkle-Patricia tries
 
 Benefits of using Merkle-Patricia tries to implement mappings:
 
