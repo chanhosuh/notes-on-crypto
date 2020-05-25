@@ -71,9 +71,11 @@ be used in the program.
 
 ## Transactions
 
-A *transaction* is an atomic operation on the world state initiated by an EOA.  A transaction can succeed or fail but can never execute partially.
+A *transaction* is an atomic operation on the world state initiated by an EOA.  A transaction can
+succeed or fail but can never execute partially.
 
-Every transaction costs *gas*, which is the unit of computation on the Ethereum blockchain.  Each gas unit for transaction execution must be paid for with ether.  A transaction sender will specify a *gas price*
+Every transaction costs *gas*, which is the unit of computation on the Ethereum blockchain.  Each gas
+unit for transaction execution must be paid for with ether.  A transaction sender will specify a *gas price*
 s/he is willing to pay and also a *gas limit*, an upper bound for the maximum amount of gas he or she
 is willing to pay to execute the transaction.
 
@@ -93,26 +95,37 @@ transaction is atomic, all calls succeed or they all get rollbacked.
 
 Transaction fields:
 
-- nonce:
-  number of transactions sent by originating account
-- gasprice:
-  value in wei paid per unit of gas for executing the transaction
-- gaslimit:
-  max amount of gas to be spent on transaction execution
-- to;
+- *recipient (to)*:
   recipient address, EOA or CA
   for contract creation, this is empty (zero address)
-- value:
+- *value:*
   value in wei paid to recipient
   for contract creation, this is the starting balance of the created contract
-- v, r, s:
-  signature values used to authenticate the sender of transaction
-- data:
-  not used for contract creation
-  usually has the ABI info needed to invoke a smart contract function
-- init:
-  only for contract creation
-  EVM code for contract initialization
+- *data:*
+  usually has the ABI-encoded data needed to invoke a smart contract function, but
+  for contract creation, will have the constructor initilization and smart contract
+  bytecode
+- *gas price*:
+  value in wei paid per unit of gas for executing the transaction
+- *gas limit*:
+  max amount of gas to be spent on transaction execution
+- *nonce*:
+  number of transactions sent by originating account
+- *signature (v, r, s)*:
+  elliptic curve signature values used to authenticate the sender of transaction
+
+Note a transaction must be sent by an EOA, not a CA.  This is because it requires a
+signature, which only EOAs have.  As mentioned above, a transaction may spawn
+multiple message calls as side-effects but these do not have signatures.
+
+The "data" field contains the encoded information to call the appropriate
+function on a smart contract with the necessary arguments.  This encoding is necessary
+since the EVM processes bytecodes, not the higher-level abstractions of the smart
+contract language.  This is analogous to how a CPU on a PC understands assembly code,
+not higher-level programming languages like Java or Python.  This encoding is called
+the ABI.
+
+
 
 
 ## Blocks
@@ -158,6 +171,9 @@ https://takenobu-hs.github.io/downloads/ethereum\_evm\_illustrated.pdf
 https://pegasys.tech/ethereum-explained-merkle-trees-world-state-transactions-and-more/
 https://blog.ethereum.org/2015/11/15/merkling-in-ethereum/
 https://github.com/ethereum/wiki/wiki/Patricia-Tree
+
+### Transactions
+https://programtheblockchain.com/posts/2017/12/29/how-ethereum-transactions-work/
 
 ### Smart contract storage
 https://programtheblockchain.com/posts/2018/03/09/understanding-ethereum-smart-contract-storage/
