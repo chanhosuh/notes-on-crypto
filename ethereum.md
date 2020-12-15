@@ -19,19 +19,19 @@ voting or other mechanisms.
 
 ## The world state
 
-The blockchain maintains a globally consistent state through consensus, often called the *world state*,
-due to Ethereum's nickname as the "world computer".  The world state is a mapping from addresses to accounts.
+The blockchain maintains a globally consistent state through consensus, often called the
+*world state*, due to Ethereum's nickname as the "world computer".  The world state is a
+mapping from addresses to accounts.
 
-The world state is not literally stored in the blocks of the blockchain; however, any node can re-create
-this state by executing the transactions of every block.  This is why it's important to remember
-that Ethereum is a state machine.  Every node must process every transaction in order to update to
-the latest state.  This sacrifices ease-of-use for security, as every state is then validated by
-every node in the network. 
+The world state is not literally stored in the blocks of the blockchain; however, any node
+can re-create this state by executing the transactions of every block.  This is why it's
+important to remember that Ethereum is a state machine.  Every node must process every
+transaction in order to update to the latest state.  This sacrifices ease-of-use for security,
+as every state is then validated by every node in the network. 
 
-The world state is stored on a node as a trie.  Many of the important data in Ethereum is stored using
-the trie data structure.  This includes *storage* for each smart contract, and transaction logs, called *receipts*.
-Ethereum uses a particular form of trie called a *Merkle-Patricia trie*.  This is a highly efficient
-data structure that allows *Merkle proofs*.
+The world state is stored on a node as a trie.  Many of the important data in Ethereum is
+stored using the trie data structure.  This includes *storage* for each smart contract, and
+transaction logs, called *receipts*. Ethereum uses a particular form of trie called a *Merkle-Patricia trie*.  This is a highly efficient data structure that allows *Merkle proofs*.
 
 
 ## Account
@@ -44,16 +44,11 @@ Each address maps to an account, which is stateful. An account consists of:
 
 *Balance* is the ether balance the account owns, in Wei.    
 
-*Nonce* is a counter.  Its meaning differs depending on the kind of account.  Accounts can be of two
-types: externally-owned (EOA) or a contract (CA).  An EOA nonce counts how many transactions have
-originated from that account.  A CA nonce is one more than the number of contract creations initiated
-by the CA.
+*Nonce* is a counter.  Its meaning differs depending on the kind of account.  Accounts can be of two types: externally-owned (EOA) or a contract (CA).  An EOA nonce counts how many transactions have originated from that account.  A CA nonce is one more than the number of contract creations initiated by the CA.
 
-*Storage root* is the root hash of the storage trie belonging to the account.  This field is empty for
-an EOA and for CAs without any storage variables set.
+*Storage root* is the root hash of the storage trie belonging to the account.  This field is empty for an EOA and for CAs without any storage variables set.
 
-*Code hash* is the hash of the EVM bytecode of the account.  This field is the hash of the empty string
-for an EOA.
+*Code hash* is the hash of the EVM bytecode of the account.  This field is the hash of the empty string for an EOA.
 
 
 ### Externally-owned accounts (EOA)
@@ -61,28 +56,18 @@ for an EOA.
 
 ### Smart contract accounts (CA)
 
-A smart contract gets created by a transaction which contains all the contract bytecode in its `init`
-field.  Upon creation, it is assigned an address, which allows value transfers to and from it, in
-addition to message calls to it from either EOAs or other smart contracts.
+A smart contract gets created by a transaction which contains all the contract bytecode in its `init` field.  Upon creation, it is assigned an address, which allows value transfers to and from it, in addition to message calls to it from either EOAs or other smart contracts.
 
-The smart contract's *storage* maintains variables, such as its ether balance and others that may
-be used in the program.
+The smart contract's *storage* maintains variables, such as its ether balance and others that may be used in the program.
 
 
 ## Transactions
 
-A *transaction* is an atomic operation on the world state initiated by an EOA.  A transaction can
-succeed or fail but can never execute partially.
+A *transaction* is an atomic operation on the world state initiated by an EOA.  A transaction can succeed or fail but can never execute partially.
 
-Every transaction costs *gas*, which is the unit of computation on the Ethereum blockchain.  Each gas
-unit for transaction execution must be paid for with ether.  A transaction sender will specify a *gas price*
-s/he is willing to pay and also a *gas limit*, an upper bound for the maximum amount of gas he or she
-is willing to pay to execute the transaction.
+Every transaction costs *gas*, which is the unit of computation on the Ethereum blockchain.  Each gas unit for transaction execution must be paid for with ether.  A transaction sender will specify a *gas price* s/he is willing to pay and also a *gas limit*, an upper bound for the maximum amount of gas he or she is willing to pay to execute the transaction.
 
-In the event of a failed transaction,
-any effects on the state are rollbacked.  However, the EOA will not get refunded the gas
-cost, as that is required to pay the miners; this is protection against DoS.  Failed, but mined, transactions
-are still stored on the blockchain however.
+In the event of a failed transaction, any effects on the state are rollbacked.  However, the EOA will not get refunded the gas cost, as that is required to pay the miners; this is protection against DoS. Failed, but mined, transactions are still stored on the blockchain however.
 
 A transaction is one of two types:
 
@@ -90,14 +75,19 @@ A transaction is one of two types:
 is a special case of the former).
 - *contract creation*: creates a contract at a new address (sometimes called contract deployment)
 
-Note that calling a contract can invoke further message calls to other accounts, but the entire
-transaction is atomic, all calls succeed or they all get rollbacked.
+Note that calling a contract can invoke further message calls to other accounts, but the entire transaction is atomic, all calls succeed or they all get rollbacked.
 
 Transaction fields:
 
+- *nonce*:
+  number of transactions sent by originating account
+- *gas price*:
+  value in wei paid per unit of gas for executing the transaction
+- *gas limit*:
+  max amount of gas to be spent on transaction execution
 - *recipient (to)*:
   recipient address, EOA or CA
-  for contract creation, this is empty (zero address)
+  for contract creation, this is empty (null address)
 - *value:*
   value in wei paid to recipient
   for contract creation, this is the starting balance of the created contract
@@ -105,14 +95,14 @@ Transaction fields:
   usually has the ABI-encoded data needed to invoke a smart contract function, but
   for contract creation, will have the constructor initilization and smart contract
   bytecode
-- *gas price*:
-  value in wei paid per unit of gas for executing the transaction
-- *gas limit*:
-  max amount of gas to be spent on transaction execution
-- *nonce*:
-  number of transactions sent by originating account
-- *signature (v, r, s)*:
-  elliptic curve signature values used to authenticate the sender of transaction
+- *v*:
+  elliptic curve signature component
+- *r*:
+  elliptic curve signature component
+- *s*:
+  elliptic curve signature component
+
+The last three fields constitute the signature used to authenticate the sender of transaction.
 
 Note a transaction must be sent by an EOA, not a CA.  This is because it requires a
 signature, which only EOAs have.  As mentioned above, a transaction may spawn
