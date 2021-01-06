@@ -31,7 +31,8 @@ as every state is then validated by every node in the network.
 
 The world state is stored on a node as a trie.  Many of the important data in Ethereum is
 stored using the trie data structure.  This includes *storage* for each smart contract, and
-transaction logs, called *receipts*. Ethereum uses a particular form of trie called a *Merkle-Patricia trie*.  This is a highly efficient data structure that allows *Merkle proofs*.
+transaction logs, called *receipts*. Ethereum uses a particular form of trie called a
+*Merkle-Patricia trie*.  This is a highly efficient data structure that allows *Merkle proofs*.
 
 
 ## Account
@@ -44,14 +45,34 @@ Each address maps to an account, which is stateful. An account consists of:
 
 *Balance* is the ether balance the account owns, in Wei.    
 
-*Nonce* is a counter.  Its meaning differs depending on the kind of account.  Accounts can be of two types: externally-owned (EOA) or a contract (CA).  An EOA nonce counts how many transactions have originated from that account.  A CA nonce is one more than the number of contract creations initiated by the CA.
+*Nonce* is a counter.  Its meaning differs depending on the kind of account.  Accounts can be
+of two types: externally-owned (EOA) or a contract (CA).  An EOA nonce counts how many
+transactions have originated from that account.  A CA nonce is one more than the number of
+contract creations initiated by the CA.
 
-*Storage root* is the root hash of the storage trie belonging to the account.  This field is empty for an EOA and for CAs without any storage variables set.
+*Storage root* is the root hash of the storage trie belonging to the account.  This field is
+empty for an EOA and for CAs without any storage variables set.
 
-*Code hash* is the hash of the EVM bytecode of the account.  This field is the hash of the empty string for an EOA.
+*Code hash* is the hash of the EVM bytecode of the account.  This field is the hash of the
+empty string for an EOA.
 
 
 ### Externally-owned accounts (EOA)
+We may think of an EOA as belonging to an actor external to the Ethereum network.  From the
+viewpoint of Ethereum itself, the only difference between an EOA and a CA is that an EOA has:
+
+- a private key
+- no EVM bytecode
+- no storage 
+
+On the other hand, a CA has:
+
+- no private key
+- EVM bytecode
+- storage
+
+An EOA's private key is used to sign transactions.  Every transaction must be signed by an
+EOA and every change to the world state is initiated by a transaction.
 
 
 ### Smart contract accounts (CA)
@@ -116,9 +137,17 @@ not higher-level programming languages like Java or Python.  This encoding is ca
 the ABI.
 
 
-
-
 ## Blocks
+
+Transitions to the world state happen through transactions, but transactions are not processed
+individually by miners but in a batch called a *block*.  Each miner assembles a block from a
+pool of available transactions and then engages in proof-of-work on the block.  If the miner
+succeeds in finding a solution to the proof-of-work puzzle, it will submit the block (with
+solution) to the network for validation and propagation.  
+
+Thus the world state updates one batch of transactions at a time.  The resulting state may
+depend on the ordering of transactions within the block and it is important to note that this
+order is completely determined by the miner.
 
 
 ### Block headers
