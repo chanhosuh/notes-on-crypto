@@ -24,17 +24,30 @@ https://ethresear.ch/t/improving-front-running-resistance-of-x-y-k-market-makers
 
 Uniswap is the original constant-product AMM which originated out of Vitalik's influential AMM post.  Vitalik gave much input into its design and implementation (which explains why the original V1 platform is written in Vyper!).  
 
-x * y = k
+In Uniswap, each *liquidity pool* consists of two tokens, each held in some quantity.  When a swap is made, one token is added in some quantity, increasing its pool reserve, and another is taken out in some quantity, decreasing its pool reserve.  The quantity that is taken out depends on the quantity being put in and the size of the two reserves and is given by a precise mathemaatical formula:
 
-x_in = amount transferred in
-x_in_fee = x_in * 0.997 (take out 30 basis points for fee)
-(x + x_in_fee) (y - y_out) = k
+<p align="center">y_out = y * x_in_fee / (x + x_in_fee)</p>
 
-y_out = y - k /  (x + x_in_fee) 
-y_out = y - x * y / (x + x_in_fee)
-y_out = y * x_in_fee / (x + x_in_fee)     (formula given in `getInputPrice`) 
 
-Note that because x_in_fee is *smaller* than x_in, the actual invariant k given by product of the two reserves is greater than before the swap.  The invariant increases after each swap due to fees.
+*x* and *y* represent the two token reserve amounts.  
+*x_in* = amount transferred in
+*x_in_fee = x_in * 0.997* (take out 30 basis points for fee)
+*y_out* = amount transferred out
+
+The above formula is the one used in practice for swapping, but it is helpful to know it is equivalent to:
+
+<p align="center">(x + x_in_fee) (y - y_out) = x &middot; y</p>
+
+This equation shows the product of the two reserve quantities is maintained before and after the swap, at least if we ignore fees.  The product is usually denoted *k* and is called the Uniswap invariant.
+
+The famous constant-product formula: 
+
+<p align="center">x &middot; y = k</p>
+
+In reality since the fee is taken out of the input amount, the actual product of the reserves including the fee after the swap is greater than before the swap.  Thus the "invariant" increases after each swap due to fees.  $k$ also will increase or decrease whenever liquidity is added or removed, respectively.
+
+
+
 
 https://github.com/Uniswap/uniswap-v1/blob/master/contracts/uniswap_exchange.vy
 
